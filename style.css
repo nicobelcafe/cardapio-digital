@@ -80,26 +80,6 @@ body {
     color: var(--accent);
 }
 
-.theme-toggle-btn {
-    background: var(--card-bg);
-    border: 1px solid var(--border-card);
-    color: var(--text-main);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-}
-
-.theme-toggle-btn:hover {
-    border-color: var(--accent);
-    transform: scale(1.08);
-}
-
 /* Busca e Filtros refinados */
 .store-controls {
     display: flex;
@@ -565,4 +545,61 @@ body {
     text-align: center;
     padding: 2.5rem 0;
     font-weight: 600;
+}
+
+/* Botão do Tema com texto claro */
+.theme-toggle-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-card);
+    color: var(--text-main);
+    padding: 8px 14px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.theme-toggle-btn:hover {
+    border-color: var(--accent);
+    transform: scale(1.03);
+}
+
+/* Banner de aviso centralizado e contido */
+/* Banner de Alerta Crítico (Vermelho e Alta Visibilidade) */
+.banner-testes {
+    background: #fef2f2;
+    border: 2px solid #ef4444;
+    color: #991b1b;
+    font-size: 0.82rem;
+    text-align: center;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+    line-height: 1.4;
+    font-weight: 500;
+}
+.banner-testes span {
+    font-size: 1.5rem;
+    display: inline-block; /* Obrigatório para a margem vertical funcionar */
+    margin-bottom: 8px;
+}
+.banner-testes strong {
+    color: #7f1d1d;
+    font-weight: 800;
+}
+
+/* Ajuste do banner para o Modo Escuro */
+[data-theme="dark"] .banner-testes {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: #ef4444;
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .banner-testes strong {
+    color: #fecaca;
 }
