@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cardápio Virtual - Nicobel</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
+    <!-- Carregando os scripts de forma clássica -->
+    <script src="carrinho.js"></script>
+    <script src="cardapio.js"></script>
+</head>
+<body>
+
+    <div class="header-brand">
+        <h1><span>NICOBEL</span> CAFÉ</h1>
+    <button class="theme-toggle-btn" onclick="alternarTema()" title="Mudar Tema">
+        🌙
+    </button>
+        <h1>Nicobel</h1>
+    </div>
+
+    <div id="conteudo" class="container"></div>
+
+    <script>
+        (async function() {
+            if (typeof CONFIG === 'undefined') {
+                document.getElementById('conteudo').innerHTML = "<p class='msg-error'>Erro: Arquivo config.js não encontrado.</p>";
+                return;
+            }
+
+            const urlBin = `https://api.jsonbin.io/v3/b/${CONFIG.BIN_ID}`;
+            let pratosGlobais = [];
+            let termoBusca = '';
+            let categoriaSelecionada = 'TODOS';
+
+            document.getElementById('conteudo').innerHTML = `
+                <div id="topo-carrinho"></div>
+                <div id="area-carrinho" class="cart-area"></div>
+                
+                <div class="store-controls">
+                    <input type="text" id="input-busca" placeholder="🔍 Buscar prato..." class="search-input" oninput="filtrarCardapioPrincipal(this.value)">
+                    <div id="area-categorias" class="categories-scroll"></div>
+                </div>
+
+                <div id="area-cardapio">Carregando cardápio...</div>
+                
+                <button id="btn-flutuante" onclick="document.getElementById('topo-carrinho').scrollIntoView({behavior: 'smooth'})" class="btn-float" style="display: none;">
+                    🛒 Ver Pedido
+                </button>
+            `;
+
+            window.atualizarInterfaceTotal = function() {
+                if (typeof renderizarCarrinho === 'function') {
+                    renderizarCarrinho('area-carrinho', 'btn-flutuante', window.atualizarInterfaceTotal);
+                }
+                if (typeof renderizarCardapio === 'function') {
+                    renderizarCardapio(pratosGlobais, categoriaSelecionada, termoBusca, 'area-cardapio', 'area-categorias');
+                }
+            };
+
+            window.filtrarCardapioPrincipal = function(valor) {
+                termoBusca = valor.toLowerCase().trim();
+                window.atualizarInterfaceTotal();
+            };
+
+            window.mudarCategoriaPrincipal = function(cat) {
+                categoriaSelecionada = cat;
+                window.atualizarInterfaceTotal();
+            };
+
+            try {
+                const resp = await fetch(`${urlBin}/latest`, {
+                    headers: { "X-Access-Key": CONFIG.API_KEY },
+                    cache: "no-store"
+                });
+                
+                if (!resp.ok) throw new Error();
+                const json = await resp.json();
+                
+                const estoque = (json.record && json.record.estoque) ? json.record.estoque : [];
+                const ingredientes = (json.record && json.record.ingredientes) ? json.record.ingredientes : [];
+
+                pratosGlobais = estoque
+                    .filter(item => !item.pedido)
+                    .map(item => {
+                        item.disponibilidadeCalculada = typeof calcularDisponibilidadeReal === 'function' 
+                            ? calcularDisponibilidadeReal(item, ingredientes) 
+                            : (Number(item.quantidade) || 0);
+                        return item;
+                    })
+                    .filter(item => item.disponibilidadeCalculada > 0);
+
+                window.atualizarInterfaceTotal();
+            } catch (e) {
+                document.getElementById('area-cardapio').innerHTML = "<p class='msg-error'>Falha ao carregar o cardápio. Tente novamente mais tarde.</p>";
+            }
+        })();
+
+    function alternarTema() {
+    const atual = document.documentElement.getAttribute('data-theme');
+    const novo = atual === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', novo);
+    localStorage.setItem('theme', novo);
+}
+
+// Carregar tema salvo ao iniciar
+(function() {
+    const salvo = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', salvo);
+})();
+    </script>
+</body>
+</html>

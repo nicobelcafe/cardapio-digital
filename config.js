@@ -1,0 +1,4 @@
+const CONFIG = {
+    BIN_ID: '6a850c6cda38895dfef5307b',
+    API_KEY: '$2a$10$JTYQBlRKLyFLen6pVnS1VOcbAFxOhgF8P2IqSCcCALcIC.4TuJFmq'
+};
